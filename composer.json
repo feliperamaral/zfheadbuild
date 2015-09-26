@@ -1,0 +1,25 @@
+{
+    "name": "feliperamaral/zfheadbuild",
+    "description": "Zend Framework 2 module for assests builds",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Felipe Amaral",
+            "email": "feliperamaral80@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4",
+        "zendframework/zend-view": "2.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "HeadBuild": "src"
+        },
+        "classmap": [
+            "Module.php"
+        ]
+    }
+}
