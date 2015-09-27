@@ -35,19 +35,18 @@ trait HeadBuildTrait {
 
             $manifestFile = $this->getManifestFile();
 
-            $manifestPullPath = $publicPath . '/' . $manifestFile;
+            $manifestPullPath = realpath("$publicPath/$manifestFile");
 
-            if (is_file($manifestPullPath)) {
-                $manifest = json_decode(file_get_contents($manifestPullPath), true);
-            } else {
+            if (!is_file($manifestPullPath)) {
                 throw new RuntimeException("The file \"{$manifestFile}\" not exists in \"{$publicPath}\"");
             }
+            $manifest = json_decode(file_get_contents($manifestPullPath), true);
 
-            if (isset($manifest[$newSrc])) {
-                $src = $this->getView()->basePath('build/' . $manifest[$newSrc]);
-            } else {
+            if (!isset($manifest[$newSrc])) {
                 throw new InvalidArgumentException("The \"{$src}\" not exists in \"{$manifestFile}\"");
             }
+            $baseBuildPath = $this->getBaseBuildPath($manifestPullPath, $basePath);
+            $src = $basePath . '/' . ($baseBuildPath . '/' . $manifest[$newSrc]);
         }
         return parent::__call($method, $args);
     }
@@ -73,6 +72,15 @@ trait HeadBuildTrait {
         }
 
         return $this->publicPath = trim($path, '\/');
+    }
+
+    private function getBaseBuildPath($manifestPullPath, $basePath) {
+        $basePath = str_replace('/', '\\', $basePath);
+        $buildPath = explode($basePath, $manifestPullPath);
+        $buildPath = end($buildPath);
+        $buildPath = explode('\\', trim($buildPath, '\\'));
+
+        return $buildPath[0];
     }
 
     private function getManifestFile() {
