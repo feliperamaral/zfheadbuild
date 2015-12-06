@@ -72,7 +72,7 @@ trait HeadBuildTrait {
             $path = $this->generatePublicPath();
         }
 
-        return $this->publicPath = trim($path, '\/');
+        return $this->publicPath = rtrim($path, '\/');
     }
 
     private function getBaseBuildPath($manifestPullPath, $basePath) {
@@ -92,7 +92,7 @@ trait HeadBuildTrait {
         if (isset($configs['headbuild']['manifest_file'])) {
             $path = trim($configs['headbuild']['manifest_file'], '\/');
         } else {
-            $path = 'build\rev-manifest.json';
+            $path = 'build/rev-manifest.json';
         }
         return $path;
     }
