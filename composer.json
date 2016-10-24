@@ -1,6 +1,6 @@
 {
     "name": "feliperamaral/zfheadbuild",
-    "description": "Zend Framework 2 module for assests builds",
+    "description": "Zend Framework 2/3 module for assests builds",
     "type": "library",
     "license": "BSD-3-Clause",
     "authors": [

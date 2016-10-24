@@ -2,6 +2,7 @@
 
 namespace HeadBuild\View\Helper;
 
+use Interop\Container\ContainerInterface;
 use Zend\View\Exception\RuntimeException;
 use Zend\View\Exception\InvalidArgumentException;
 
@@ -13,6 +14,16 @@ trait HeadBuildTrait
     private $_configs;
 
     /**
+     * @var \Zend\ServiceManager\ServiceManager
+     */
+    protected $sm;
+
+    public function __construct(ContainerInterface $sm)
+    {
+        $this->sm = $sm;
+    }
+
+    /**
      *
      * @param string $method Method to call
      * @param  array  $args   Arguments of method
@@ -22,7 +33,6 @@ trait HeadBuildTrait
      */
     public function __call($method, $args)
     {
-
         if (preg_match('/build$/i', $method)) {
             $method = preg_replace('/build$/i', '', $method);
 
@@ -32,8 +42,8 @@ trait HeadBuildTrait
                 $src = &$args[1];
             }
             $publicPath = $this->getPublicPath();
-            $basePath   = $this->getView()->basePath();
-            $newSrc     = trim(str_replace($basePath, '', $src), '\/');
+            $basePath = $this->getView()->basePath();
+            $newSrc = trim(str_replace($basePath, '', $src), '\/');
 
             $manifestFile = $this->getManifestFile();
 
@@ -48,9 +58,10 @@ trait HeadBuildTrait
                 throw new InvalidArgumentException("The \"{$src}\" not exists in \"{$manifestFile}\"");
             }
 
-            $baseBuildPath = $this->getBaseBuildPath($manifestPullPath, $basePath? : dirname($_SERVER['SCRIPT_FILENAME']));
-            $src           = $basePath . '/' . ($baseBuildPath . '/' . $manifest[$newSrc]);
+            $baseBuildPath = $this->getBaseBuildPath($manifestPullPath, $basePath ?: dirname($_SERVER['SCRIPT_FILENAME']));
+            $src = $basePath . '/' . ($baseBuildPath . '/' . $manifest[$newSrc]);
         }
+
         return parent::__call($method, $args);
     }
 
@@ -80,7 +91,7 @@ trait HeadBuildTrait
 
     private function getBaseBuildPath($manifestPullPath, $basePath)
     {
-        $basePath         = str_replace('\\', '/', $basePath);
+        $basePath = str_replace('\\', '/', $basePath);
         $manifestPullPath = str_replace('\\', '/', $manifestPullPath);
 
         $buildPath = explode($basePath, $manifestPullPath);
@@ -106,14 +117,12 @@ trait HeadBuildTrait
 
     private function getConfigs()
     {
-        if ($this->_configs) {
-            return $this->_configs;
-        }
-        return $this->_configs = $this->
-                getView()->
-                getHelperPluginManager()->
-                getServiceLocator()->
+        if (!$this->_configs) {
+            $this->_configs = $this->
+                sm->
                 get('config');
+        }
+        return $this->_configs;
     }
 
     /**
@@ -121,11 +130,10 @@ trait HeadBuildTrait
      */
     public function generatePublicPath()
     {
-        $cwd      = realpath(getcwd());
+        $cwd = realpath(getcwd());
         $filename = realpath($_SERVER['SCRIPT_FILENAME']);
 
         $publicDir = preg_replace('/[^\\\\\/]*$/', '', str_replace($cwd, '', $filename));
         return realpath(trim($publicDir, '\/'));
     }
-
 }

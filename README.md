@@ -1,4 +1,4 @@
-# Zend Framework 2 Head*Build Module
+# Zend Framework 2/3 Head*Build Module
 
 ## Como funciona:
 Hoje em dia é muito utilizado automatizadores de tarefas para front-end como `Grunt`, `Gulp` e etc.
