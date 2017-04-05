@@ -58,8 +58,15 @@ trait HeadBuildTrait
                 throw new InvalidArgumentException("The \"{$src}\" not exists in \"{$manifestFile}\"");
             }
 
+            $src = $basePath . '/';
+
             $baseBuildPath = $this->getBaseBuildPath($manifestPullPath, $basePath ?: dirname($_SERVER['SCRIPT_FILENAME']));
-            $src = $basePath . '/' . ($baseBuildPath . '/' . $manifest[$newSrc]);
+
+            if ($baseBuildPath) {
+                $src .= $baseBuildPath . '/';
+            }
+
+            $src .= $manifest[$newSrc];
         }
 
         return parent::__call($method, $args);
@@ -96,9 +103,9 @@ trait HeadBuildTrait
 
         $buildPath = explode($basePath, $manifestPullPath);
         $buildPath = end($buildPath);
-        $buildPath = preg_replace('/\/.*$/', '', trim($buildPath, '/'));
+        $buildPath = preg_replace('/\/[^\/]*?$/', '', ($buildPath));
 
-        return $buildPath;
+        return trim($buildPath, '/');
     }
 
     private function getManifestFile()
